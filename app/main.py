@@ -1,10 +1,13 @@
 import time
+from importlib.metadata import version
 
 import redis
 from fastapi import FastAPI, Request, Response
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
 from .config import settings
+
+VERSION = version("visites")
 
 app = FastAPI(title="visites")
 r = redis.Redis.from_url(settings.redis_url, decode_responses=True)
@@ -32,7 +35,7 @@ async def metrics_middleware(request: Request, call_next):
 @app.get("/")
 def root(response: Response):
     n = r.incr("visites")
-    response.headers["X-Visites-Version"] = "0.1.0"
+    response.headers["X-Visites-Version"] = VERSION
     return {"visites": n}
 
 
