@@ -38,3 +38,11 @@ def test_reset_remet_le_compteur_a_zero(client):
     assert resp.json() == {"visites": 0}
 
     assert client.get("/").json() == {"visites": 1}
+
+
+def test_reset_sans_compteur_existant(client):
+    resp = client.post("/reset")
+    assert resp.status_code == 200
+    assert resp.json() == {"visites": 0}
+
+    assert client.get("/").json() == {"visites": 1}
