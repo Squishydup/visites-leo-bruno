@@ -46,3 +46,10 @@ def test_reset_sans_compteur_existant(client):
     assert resp.json() == {"visites": 0}
 
     assert client.get("/").json() == {"visites": 1}
+
+
+def test_version_header(client):
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert resp.json() == {"visites": 1}
+    assert resp.headers["X-Visites-Version"] == main.VERSION == "0.1.0"
