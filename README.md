@@ -1,5 +1,7 @@
 # Visites — API de comptage (version B réconciliée)
 
+[![CI](https://github.com/Squishydup/visites-leo-bruno/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Squishydup/visites-leo-bruno/actions/workflows/ci.yml)
+
 API FastAPI qui compte les visites dans Redis et expose des métriques Prometheus.
 
 ## Lancer en local

@@ -47,3 +47,35 @@
 ### Ce qui a pris le plus de temps
 - Attendre l'approbation de l'autre à chaque PR (les règles l'imposent, y compris pour le propriétaire du dépôt).
 - La compilation du hook gitleaks officiel (Go) sur la VM.
+
+## TP03
+
+### Pipeline
+- `.github/workflows/ci.yml` : déclenché sur push vers main et sur pull_request, `permissions: contents: read`, actions épinglées par tag majeur (checkout@v5, setup-python@v6).
+- Étapes : pip install, ruff (check + format), pre-commit run --all-files (gitleaks installé dans le job car notre hook est local), pytest avec couverture XML + HTML, `htmlcov/` publié en artefact (7 jours).
+- Couverture : 100 % sur app/__init__.py, app/config.py et app/main.py (main.py est le plus gros fichier, 42 lignes).
+
+### Durées
+- Job unique, Python 3.13, sans cache : 18 s ; avec pre-commit et couverture : 25 s.
+- Matrice 3.12/3.13 : première exécution (cache miss) XX s, seconde exécution (« Cache restored ») XX s. Clé de cache calculée sur `pyproject.toml`.
+
+### Checks requis
+- Noms exacts dans le ruleset : `test (py3.12)` et `test (py3.13)`.
+- PR #22 : en-tête renommé volontairement, les deux checks rouges (`tests/test_api.py:55`, l'en-tête `X-Visites-Version` absent de la réponse), fusion bloquée ; commit correctif, checks verts, PR débloquée puis fusionnée.
+
+### act
+- `act pull_request --matrix python:3.13` exécute le job jusqu'au bout dans le conteneur catthehacker/ubuntu:act-latest (config dans ~/.actrc).
+- Identique à GitHub : checkout, setup-python, pip install, ruff, pre-commit, pytest (7 passed).
+- Échoue en local : `upload-artifact` (« Unable to get the ACTIONS_RUNTIME_TOKEN » : pas de service d'artefacts GitHub), et le cache pip n'est jamais restauré (pas de service de cache GitHub).
+
+### Réponses aux questions des étapes
+- Workflow déclenché sur la PR alors que main ne contient pas ci.yml : sur `pull_request`, GitHub utilise les workflows présents dans la branche de la PR (commit de fusion PR + main).
+- Seuil de couverture : oui, un seuil (ex. 80 %) empêche la couverture de reculer ; pas 100 %, car les dernières lignes coûtent cher pour peu de valeur et poussent à écrire des tests creux.
+- Matrice : deux checks apparaissent sur la PR ; il faut exiger les deux dans le ruleset.
+- Bypass : un administrateur qui contourne peut fusionner malgré une CI rouge ; ce droit doit être réservé à très peu de personnes et aux urgences, et chaque contournement est tracé (PR, journal d'audit, Rule insights). Notre ruleset n'a aucun bypass.
+- act ne remplace pas GitHub Actions pour valider une PR : seul le check exécuté par GitHub compte pour le ruleset. Il est utile pour mettre au point un workflow sans pousser à chaque essai, et indispensable quand on ne peut pas ou ne veut pas consommer de minutes GitHub Actions.
+
+### Questions d'observation
+- Q1 : environ 20 à 30 s par job. Le plus long : l'installation de Python et des dépendances, puis l'initialisation des hooks pre-commit. Effet du cache : voir les durées ci-dessus.
+- Q2 : le ruleset (checks requis + PR obligatoire + revue + aucun bypass) ; sans ruleset, le pipeline n'est qu'un avis.
+- Q3 : pour Gitea Actions, presque rien (déplacer le fichier dans `.gitea/workflows`). Pour GitLab CI, tout le fichier est à réécrire en `.gitlab-ci.yml` (stages, image python, `parallel: matrix`, `cache: key: files`, `artifacts: paths`), mais avec les mêmes concepts.
