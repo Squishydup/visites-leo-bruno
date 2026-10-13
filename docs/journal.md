@@ -19,3 +19,12 @@
 - Connexion de `gh` sans navigateur sur la VM (code d'appareil).
 - Pas de dépôt modèle fourni : création du modèle nous-mêmes.
 - Deux conflits résolus par rebase : `tests/test_api.py` (ajouts concurrents) et le titre du README.
+
+## TP02
+
+### Secret historique (étape 5)
+- Contexte : notre dépôt n'ayant pas été créé depuis le modèle du formateur, nous avons planté nous-mêmes un faux jeton avant de protéger `main`, pour reproduire le scénario.
+- Détecté par `gitleaks git --verbose --redact .` : règle `generic-api-key`, entropie 5,27.
+- Commit fautif : `c84a70dbd9e8632f6edc6eac6ed1eb1d60cf7294`, auteur Léo Berganton, 13/10/2026 06:47 UTC, fichier `app/old_settings.py` ligne 2.
+- Décision sur l'historique : nous ne réécrivons pas l'historique (`git filter-repo` obligerait tout le monde à recloner et ne supprime pas les copies déjà faites : forks, clones, caches).
+- Rotation : le secret a été poussé sur une forge publique, il est donc considéré comme compromis. Un vrai jeton aurait été révoqué immédiatement chez le fournisseur et remplacé par un nouveau, stocké hors du dépôt (variable d'environnement ou gestionnaire de secrets). Ici : fichier supprimé du dépôt, empreinte ajoutée à `.gitleaksignore` pour que le rapport historique soit propre (`docs/gitleaks.json`, code retour 0).
