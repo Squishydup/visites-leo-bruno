@@ -57,7 +57,7 @@
 
 ### Durées
 - Job unique, Python 3.13, sans cache : 18 s ; avec pre-commit et couverture : 25 s.
-- Matrice 3.12/3.13 : première exécution (cache miss) XX s, seconde exécution (« Cache restored ») XX s. Clé de cache calculée sur `pyproject.toml`.
+- Matrice 3.12/3.13 : première exécution (cache miss) 33 s (3.12) et 30 s (3.13), seconde exécution (« Cache restored ») 25 s (3.12) et 30 s (3.13) ; gain faible car les dépendances sont légères. Clé de cache calculée sur `pyproject.toml`.
 
 ### Checks requis
 - Noms exacts dans le ruleset : `test (py3.12)` et `test (py3.13)`.
