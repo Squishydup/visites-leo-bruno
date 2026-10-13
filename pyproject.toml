@@ -20,7 +20,7 @@ dev = [
     "pytest-cov>=7",
     "httpx>=0.28",
     "fakeredis>=2.32",
-    "ruff>=0.14",
+    "ruff>=0.17.0",
     "pre-commit>=4.6",
 ]
 
