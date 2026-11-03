@@ -1,5 +1,5 @@
 # Dockerfile volontairement naïf : il sera amélioré dans un TP suivant
-FROM python:3.13
+FROM python:3.15
 WORKDIR /app
 COPY . .
 RUN pip install .
