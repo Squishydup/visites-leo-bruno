@@ -21,7 +21,7 @@ dev = [
     "httpx>=0.28",
     "fakeredis>=2.32",
     "ruff>=0.14",
-    "pre-commit>=4.6",
+    "pre-commit>=4.6.2",
 ]
 
 [tool.setuptools]
